@@ -231,7 +231,7 @@ document.addEventListener("DOMContentLoaded", () => {
   <main class="flex justify-center items-center my-12 px-4">
     <div class="text-center bg-gradient-to-br from-red-600 to-orange-500 text-white p-10 rounded-3xl shadow-lg max-w-4xl w-full">
       <h2 class="text-5xl font-extrabold mb-4 whitespace">Site List</h2>
-      <p class="text-xl opacity-90">A comprehensive list of all TIR monitoring sites in our network.</p>
+      <p class="text-xl opacity-90">A comprehensive list of the TIR monitoring sites in our network.</p>
     </div>
   </main>
   
@@ -244,14 +244,6 @@ document.addEventListener("DOMContentLoaded", () => {
       <label for="pftFilter" class="mb-1 font-medium text-gray-700">Filter by PFT:</label>
       <select id="pftFilter" class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
         <option value="">All PFTs</option>
-      </select>
-    </div>
-
-    <!-- Sensor Type Filter -->
-    <div class="flex flex-col">
-      <label for="sensorFilter" class="mb-1 font-medium text-gray-700">Sensor Type:</label>
-      <select id="sensorFilter" class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
-        <option value="">All Sensors</option>
       </select>
     </div>
 
@@ -274,7 +266,6 @@ document.addEventListener("DOMContentLoaded", () => {
           <th class="p-3 border-b">Longitude</th>
           <th class="p-3 border-b">Elevation (m)</th>
           <th class="p-3 border-b">PFT</th>
-          <th class="p-3 border-b">Sensor Type</th>
           <th class="p-3 border-b">Site Status</th>
           <th class="p-3 border-b">Site Details</th>
         </tr>
