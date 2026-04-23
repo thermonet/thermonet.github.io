@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TIR-ific Network | Post-Processing</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-900 font-sans">
+
+<!-- GRADIENT NAVIGATION BAR -->
+<nav class="bg-gradient-to-br from-red-600 to-orange-500 text-white sticky top-0 z-50 shadow-lg">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between h-16 items-center">
+      <div class="text-white font-extrabold text-xl">TIR-ific Network</div>
+
+      <div class="flex items-center space-x-6"> 
+        <a href="index.html" class="hover:underline">Home</a>
+        <a href="map.html" class="hover:underline">Map</a>
+
+    <!-- Sites Dropdown -->
+    <div class="relative dropdown-container">
+      <button onclick="toggleDropdown('sitesMenu')" class="hover:underline flex items-center gap-1 focus:outline-none">
+        Sites
+        <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20">
+          <path d="M5.5 7l4.5 4.5L14.5 7z" />
+        </svg>
+      </button>
+      <div id="sitesMenu" class="dropdown-menu absolute left-0 mt-2 bg-white text-gray-900 rounded-md shadow-lg w-40 hidden z-50">
+        <a href="sites.html" class="block px-4 py-2 hover:bg-gray-100">Gallery</a>
+        <a href="site-list.html" class="block px-4 py-2 hover:bg-gray-100">Site List</a>
+      </div>
+    </div>
+    
+    <!-- Add Site Dropdown -->
+    <div class="relative dropdown-container">
+      <button onclick="toggleDropdown('addSiteMenu')" class="hover:underline flex items-center gap-1 focus:outline-none">
+        Contribute
+        <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20">
+          <path d="M5.5 7l4.5 4.5L14.5 7z" />
+        </svg>
+      </button>
+      <div id="addSiteMenu" class="dropdown-menu absolute left-0 mt-2 bg-white text-gray-900 rounded-md shadow-lg w-48 hidden z-50">
+        <a href="add-site.html" class="block px-4 py-2 hover:bg-gray-100">New Site Form</a>
+      </div>
+    </div>
+    <!-- How To Dropdown -->
+    <div class="relative dropdown-container">
+      <button onclick="toggleDropdown('howToMenu')" class="hover:underline flex items-center gap-1 focus:outline-none">
+        How To
+        <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20">
+          <path d="M5.5 7l4.5 4.5L14.5 7z" />
+        </svg>
+      </button>
+      <div id="howToMenu" class="dropdown-menu absolute left-0 mt-2 bg-white text-gray-900 rounded-md shadow-lg w-48 hidden z-50">
+        <a href="best-practices.html" class="block px-4 py-2 hover:bg-gray-100">Installation Guide</a>
+        <a href="tier-tables.html" class="block px-4 py-2 hover:bg-gray-100">Tiers</a>
+        <a href="post-process.html" class="block px-4 py-2 hover:bg-gray-100">Post-Processing</a>
+      </div>
+    </div>
+        <a href="about.html" class="hover:underline">About</a> 
+        <a href="contact.html" class="hover:underline">Contact</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<script>
+  function toggleDropdown(menuId) {
+    const dropdowns = document.querySelectorAll('.dropdown-menu');
+    dropdowns.forEach(dropdown => {
+      if (dropdown.id === menuId) {
+        dropdown.classList.toggle('hidden'); // Toggle the clicked one
+      } else {
+        dropdown.classList.add('hidden'); // Close all others
+      }
+    });
+  }
+
+  // Optional: close all dropdowns when clicking outside
+  document.addEventListener('click', function(event) {
+    const isClickInside = event.target.closest('.dropdown-container');
+    if (!isClickInside) {
+      document.querySelectorAll('.dropdown-menu').forEach(menu => menu.classList.add('hidden'));
+    }
+  });
+</script>
+
+<!-- WELCOME SECTION -->
+<main class="flex justify-center items-center my-12 px-4">
+  <div class="text-center bg-gradient-to-br from-red-600 to-orange-500 text-white p-10 rounded-3xl shadow-lg max-w-4xl w-full">
+    <h2 class="text-5xl font-extrabold mb-4 whitespace-nowrap">Post-Processing</h2>
+    <p class="text-xl opacity-90">
+      Learn how to correct and standardize near-surface thermal data to improve accuracy and comparability.
+    </p>
+  </div>
+</main>
+
+<!-- SECTION: POST-PROCESSING OVERVIEW -->
+<section class="max-w-5xl mx-auto px-6 my-12">
+  <h3 class="text-3xl font-bold mb-4 text-gray-800">Why Post-Processing Matters</h3>
+  <p class="text-gray-700 text-lg leading-relaxed">
+    Near-surface thermal infrared data often require correction for emissivity, reflected radiation, and atmospheric effects. While some workflows rely on default camera settings or empirical adjustments, a mechanistic correction approach ensures your data better reflect true surface temperatures and remain consistent across sites.
+  </p>
+  <figure class="flex flex-col items-center mt-12">
+    <img src="images/PostProcessSchematic.png" alt="Post-Processing Schematic" class="rounded-xl shadow-md max-w-full md:max-w-2xl" />
+    <figcaption class="mt-4 text-sm text-gray-600 text-center max-w-2xl">
+      Schematic showing thermal energy contributions detected by a sensor in an enclosure with a germanium window. Arrow sizes represent approximate relative thermal contributions, and dashes represent attenuation.
+    </figcaption>
+  </figure>
+</section>
+
+<!-- SECTION: CORRECTIR TOOL -->
+<section class="flex flex-col md:flex-row items-center justify-center max-w-6xl mx-auto my-12 p-6 border-4 rounded-3xl bg-white border-transparent bg-clip-padding bg-origin-border" style="border-image: linear-gradient(to right, #dc2626, #fb923c) 1;">
+  
+  <!-- IMAGE (smaller width) -->
+  <div class="w-full md:w-1/3 mb-6 md:mb-0 md:pr-6 flex justify-center">
+    <img src="images/correcTIR_logo.png" alt="correcTIR App Icon" class="rounded-xl shadow-md w-32 h-32 object-contain" />
+  </div>
+
+  <!-- TEXT CONTENT (larger width) -->
+  <div class="w-full md:w-2/3 text-center md:text-left">
+    <h3 class="text-3xl font-bold text-gray-800 mb-4">Process with <span class="text-red-600">correcTIR</span></h3>
+    <p class="text-gray-700 text-lg mb-6">
+      <strong>correcTIR</strong> is an open-source Python package and graphical interface that applies mechanistic corrections to near-surface thermal data. It's designed to be transparent, consistent, and easy to use—no matter your site or sensor.
+    </p>
+    <div class="flex flex-col sm:flex-row sm:space-x-4 items-center sm:items-start">
+      <a href="https://github.com/jdiehll/correcTIR.git" target="_blank" class="mb-2 sm:mb-0 px-6 py-3 bg-gradient-to-br from-red-600 to-orange-500 text-white font-semibold rounded-full shadow hover:shadow-lg transition">
+        View on GitHub
+      </a>
+      <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5270101" target="_blank" class="px-6 py-3 bg-gradient-to-br from-orange-500 to-red-600 text-white font-semibold rounded-full shadow hover:shadow-lg transition">
+        Read the Preprint
+      </a>
+    </div>
+  </div>
+</section>
+
+
+    <!-- FOOTER -->
+  <footer class="bg-gray-200 text-sm text-center p-4 mt-12">
+    © 2025 TIR-ific Network. All rights reserved.<br />
+    Connecting the world through thermal insights.
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TIR-ific Network | Contact Us</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-900 font-sans">
+<!-- GRADIENT NAVIGATION BAR -->
+<nav class="bg-gradient-to-br from-red-600 to-orange-500 text-white sticky top-0 z-50 shadow-lg">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between h-16 items-center">
+      <div class="text-white font-extrabold text-xl">TIR-ific Network</div>
+
+      <div class="flex items-center space-x-6"> 
+        <a href="index.html" class="hover:underline">Home</a>
+        <a href="map.html" class="hover:underline">Map</a>
+
+    <!-- Sites Dropdown -->
+    <div class="relative dropdown-container">
+      <button onclick="toggleDropdown('sitesMenu')" class="hover:underline flex items-center gap-1 focus:outline-none">
+        Sites
+        <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20">
+          <path d="M5.5 7l4.5 4.5L14.5 7z" />
+        </svg>
+      </button>
+      <div id="sitesMenu" class="dropdown-menu absolute left-0 mt-2 bg-white text-gray-900 rounded-md shadow-lg w-40 hidden z-50">
+        <a href="sites.html" class="block px-4 py-2 hover:bg-gray-100">Gallery</a>
+        <a href="site-list.html" class="block px-4 py-2 hover:bg-gray-100">Site List</a>
+      </div>
+    </div>
+    
+    <!-- Add Site Dropdown -->
+    <div class="relative dropdown-container">
+      <button onclick="toggleDropdown('addSiteMenu')" class="hover:underline flex items-center gap-1 focus:outline-none">
+        Contribute
+        <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20">
+          <path d="M5.5 7l4.5 4.5L14.5 7z" />
+        </svg>
+      </button>
+      <div id="addSiteMenu" class="dropdown-menu absolute left-0 mt-2 bg-white text-gray-900 rounded-md shadow-lg w-48 hidden z-50">
+        <a href="add-site.html" class="block px-4 py-2 hover:bg-gray-100">New Site Form</a>
+      </div>
+    </div>
+    <!-- How To Dropdown -->
+    <div class="relative dropdown-container">
+      <button onclick="toggleDropdown('howToMenu')" class="hover:underline flex items-center gap-1 focus:outline-none">
+        How To
+        <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20">
+          <path d="M5.5 7l4.5 4.5L14.5 7z" />
+        </svg>
+      </button>
+      <div id="howToMenu" class="dropdown-menu absolute left-0 mt-2 bg-white text-gray-900 rounded-md shadow-lg w-48 hidden z-50">
+        <a href="best-practices.html" class="block px-4 py-2 hover:bg-gray-100">Installation Guide</a>
+        <a href="tier-tables.html" class="block px-4 py-2 hover:bg-gray-100">Tiers</a>
+        <a href="post-process.html" class="block px-4 py-2 hover:bg-gray-100">Post-Processing</a>
+      </div>
+    </div>
+        <a href="about.html" class="hover:underline">About</a> 
+        <a href="contact.html" class="hover:underline">Contact</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<script>
+  function toggleDropdown(menuId) {
+    const dropdowns = document.querySelectorAll('.dropdown-menu');
+    dropdowns.forEach(dropdown => {
+      if (dropdown.id === menuId) {
+        dropdown.classList.toggle('hidden'); // Toggle the clicked one
+      } else {
+        dropdown.classList.add('hidden'); // Close all others
+      }
+    });
+  }
+
+  // Optional: close all dropdowns when clicking outside
+  document.addEventListener('click', function(event) {
+    const isClickInside = event.target.closest('.dropdown-container');
+    if (!isClickInside) {
+      document.querySelectorAll('.dropdown-menu').forEach(menu => menu.classList.add('hidden'));
+    }
+  });
+</script>
+
+  <!-- WELCOME SECTION-->
+  <main class="flex justify-center items-center my-12 px-4">
+    <div class="text-center bg-gradient-to-br from-red-600 to-orange-500 text-white p-10 rounded-3xl shadow-lg max-w-4xl w-full">
+      <h2 class="text-5xl font-extrabold mb-4 whitespace">Contact Us</h2>
+      <p class="text-xl opacity-90"></p>
+    </div>
+  </main>
+
+  <section class="max-w-2xl mx-auto mt-12 p-6 bg-white rounded-lg shadow">
+  <h2 class="text-2xl font-bold text-red-600 mb-4">Get Involved</h2>
+  <p class="text-gray-700 text-lg mb-6">
+    Want to get involved? Join the FLUXNET <a href="https://fluxnet.org/community/fluxnet-working-groups/canopy-thermal-imaging-committee/" target="_blank" class="underline text-red-600 hover:text-red-800">Canopy Thermal Imaging Committee</a> and let us know you're interested using the form below.
+  </p>
+  <a href="https://docs.google.com/forms/d/e/1FAIpQLSdgTXkel3yOYl64ppG3UKkKRmiQOGCuOeRB8RqiIQAfzRJwEQ/viewform" target="_blank" class="inline-block px-6 py-3 bg-gradient-to-br from-red-600 to-orange-500 text-white font-semibold rounded-full shadow hover:shadow-lg transition">
+    Join
+  </a>
+</section>
+
+<section class="max-w-2xl mx-auto mt-16 p-6 bg-white rounded-lg shadow">
+  <h2 class="text-2xl font-bold text-red-600 mb-4">Contact Us</h2>
+
+  <form id="contact-form" class="space-y-4">
+    <!-- Hidden FormSubmit settings -->
+    <input type="hidden" name="_template" value="table">
+    <input type="hidden" name="_subject" value="New message from TIR-ific Network Contact Form">
+    <input type="hidden" name="_captcha" value="false">
+
+    <!-- Subject -->
+    <div>
+      <label for="subject" class="block font-semibold mb-1">Subject</label>
+      <select id="subject" name="subject" class="w-full border border-gray-300 rounded-md p-2" required>
+        <option value="">-- Select a Subject --</option>
+        <option value="general">General Inquiry</option>
+        <option value="site-correction">Site Correction</option>
+        <option value="tir-paper">TIR Paper</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+
+    <!-- Name -->
+    <div>
+      <label for="name" class="block font-semibold mb-1">Your Name</label>
+      <input type="text" id="name" name="name" class="w-full border border-gray-300 rounded-md p-2" required />
+    </div>
+
+    <!-- Email -->
+    <div>
+      <label for="email" class="block font-semibold mb-1">Email Address</label>
+      <input type="email" id="email" name="email" class="w-full border border-gray-300 rounded-md p-2" required />
+    </div>
+
+    <!-- Message -->
+    <div>
+      <label for="message" class="block font-semibold mb-1">Message (max 300 words)</label>
+      <textarea id="message" name="message" rows="6" maxlength="3000" class="w-full border border-gray-300 rounded-md p-2" required></textarea>
+      <p id="word-count" class="text-sm text-gray-500 mt-1">0 / 300 words</p>
+    </div>
+
+    <!-- Thank You Message -->
+    <div id="thank-you" class="hidden text-green-600 font-semibold">
+      We’ve received your message and will get back to you shortly.
+    </div>
+
+    <!-- Submit -->
+    <div class="flex justify-end">
+      <button type="submit" class="px-6 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition">
+        Submit
+      </button>
+    </div>
+  </form>
+</section>
+
+<script>
+  document.getElementById("contact-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const form = e.target;
+    const formData = new FormData(form);
+
+    fetch("https://formsubmit.co/jdiehl@nau.edu", {
+      method: "POST",
+      body: formData
+    })
+    .then(response => {
+      if (response.ok) {
+        document.getElementById("thank-you").classList.remove("hidden");
+        form.reset();
+      } else {
+        alert("There was an error sending your message.");
+      }
+    })
+    .catch(() => alert("Failed to send. Please try again."));
+  });
+</script>
+
+
+
+    <!-- FOOTER -->
+  <footer class="bg-gray-200 text-sm text-center p-4 mt-12">
+    © 2025 TIR-ific Network. All rights reserved.<br />
+    Connecting the world through thermal insights.
+  </footer>
+
+</body>
+</html>

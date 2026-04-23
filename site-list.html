@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TIR-ific Network | Site List</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-900 font-sans">
+
+<!-- GRADIENT NAVIGATION BAR -->
+<nav class="bg-gradient-to-br from-red-600 to-orange-500 text-white sticky top-0 z-50 shadow-lg">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between h-16 items-center">
+      <div class="text-white font-extrabold text-xl">TIR-ific Network</div>
+
+      <div class="flex items-center space-x-6"> 
+        <a href="index.html" class="hover:underline">Home</a>
+        <a href="map.html" class="hover:underline">Map</a>
+
+    <!-- Sites Dropdown -->
+    <div class="relative dropdown-container">
+      <button onclick="toggleDropdown('sitesMenu')" class="hover:underline flex items-center gap-1 focus:outline-none">
+        Sites
+        <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20">
+          <path d="M5.5 7l4.5 4.5L14.5 7z" />
+        </svg>
+      </button>
+      <div id="sitesMenu" class="dropdown-menu absolute left-0 mt-2 bg-white text-gray-900 rounded-md shadow-lg w-40 hidden z-50">
+        <a href="sites.html" class="block px-4 py-2 hover:bg-gray-100">Gallery</a>
+        <a href="site-list.html" class="block px-4 py-2 hover:bg-gray-100">Site List</a>
+      </div>
+    </div>
+    
+    <!-- Add Site Dropdown -->
+    <div class="relative dropdown-container">
+      <button onclick="toggleDropdown('addSiteMenu')" class="hover:underline flex items-center gap-1 focus:outline-none">
+        Contribute
+        <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20">
+          <path d="M5.5 7l4.5 4.5L14.5 7z" />
+        </svg>
+      </button>
+      <div id="addSiteMenu" class="dropdown-menu absolute left-0 mt-2 bg-white text-gray-900 rounded-md shadow-lg w-48 hidden z-50">
+        <a href="add-site.html" class="block px-4 py-2 hover:bg-gray-100">New Site Form</a>
+      </div>
+    </div>
+    <!-- How To Dropdown -->
+    <div class="relative dropdown-container">
+      <button onclick="toggleDropdown('howToMenu')" class="hover:underline flex items-center gap-1 focus:outline-none">
+        How To
+        <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20">
+          <path d="M5.5 7l4.5 4.5L14.5 7z" />
+        </svg>
+      </button>
+      <div id="howToMenu" class="dropdown-menu absolute left-0 mt-2 bg-white text-gray-900 rounded-md shadow-lg w-48 hidden z-50">
+        <a href="best-practices.html" class="block px-4 py-2 hover:bg-gray-100">Installation Guide</a>
+        <a href="tier-tables.html" class="block px-4 py-2 hover:bg-gray-100">Tiers</a>
+        <a href="post-process.html" class="block px-4 py-2 hover:bg-gray-100">Post-Processing</a>
+      </div>
+    </div>
+        <a href="about.html" class="hover:underline">About</a> 
+        <a href="contact.html" class="hover:underline">Contact</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<script>
+  function toggleDropdown(menuId) {
+    const dropdowns = document.querySelectorAll('.dropdown-menu');
+    dropdowns.forEach(dropdown => {
+      if (dropdown.id === menuId) {
+        dropdown.classList.toggle('hidden'); // Toggle the clicked one
+      } else {
+        dropdown.classList.add('hidden'); // Close all others
+      }
+    });
+  }
+
+  // Optional: close all dropdowns when clicking outside
+  document.addEventListener('click', function(event) {
+    const isClickInside = event.target.closest('.dropdown-container');
+    if (!isClickInside) {
+      document.querySelectorAll('.dropdown-menu').forEach(menu => menu.classList.add('hidden'));
+    }
+  });
+const PFT_LOOKUP = {
+  "0": "Bare Ground",
+  "1": "Needleleaf evergreen tree – temperate",
+  "2": "Needleleaf evergreen tree – boreal",
+  "3": "Needleleaf deciduous tree – boreal",
+  "4": "Broadleaf evergreen tree – tropical",
+  "5": "Broadleaf evergreen tree – temperate",
+  "6": "Broadleaf deciduous tree – tropical",
+  "7": "Broadleaf deciduous tree – temperate",
+  "8": "Broadleaf deciduous tree – boreal",
+  "9": "Broadleaf evergreen shrub – temperate",
+  "10": "Broadleaf deciduous shrub – temperate",
+  "11": "Broadleaf deciduous shrub – boreal",
+  "12": "C3 arctic grass",
+  "13": "C3 grass",
+  "14": "C4 grass",
+  "15": "C3 Unmanaged Rainfed Crop",
+  "16": "C3 Unmanaged Irrigated Crop",
+  "17": "Managed Rainfed Crop",
+  "18": "Managed Irrigated Crop"
+};
+
+let allSites = [];
+  
+function populatePFTOptions() {
+  const pftFilter = document.getElementById("pftFilter");
+  for (const key of Object.keys(PFT_LOOKUP)) {
+    const option = document.createElement("option");
+    option.value = PFT_LOOKUP[key];
+    option.textContent = PFT_LOOKUP[key];
+    pftFilter.appendChild(option);
+  }
+}
+
+const SENSOR_TYPES = [
+  "Thermal Camera",
+  "Net Radiometer",
+  "IRT (Infrared Thermometer)"
+];
+
+function populateSensorOptions() {
+  const sensorFilter = document.getElementById("sensorFilter");
+  SENSOR_TYPES.forEach(type => {
+    const option = document.createElement("option");
+    option.textContent = type;
+    sensorFilter.appendChild(option);
+  });
+}
+  
+const STATUS_TYPES = ["active", "inactive"];
+
+function populateStatusOptions() {
+  const statusFilter = document.getElementById("statusFilter");
+  // Add status options
+  STATUS_TYPES.forEach(status => {
+    const option = document.createElement("option");
+    option.value = status;
+    option.textContent = capitalize(status);
+    statusFilter.appendChild(option);
+  });
+}
+
+// Optional utility to capitalize the first letter
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function renderSiteTable(data) {
+  const tableBody = document.getElementById("siteTableBody");
+  tableBody.innerHTML = data.map(site => `
+    <tr class="border-t hover:bg-gray-50">
+      <td class="p-3">${site.siteID}</td>
+      <td class="p-3">${site.lat}</td>
+      <td class="p-3">${site.long}</td>
+      <td class="p-3">${site.elev}</td>
+      <td class="p-3">${site.PFT}</td>
+      <td class="p-3">${site.sensor}</td>
+      <td class="p-3">${capitalize(site.status)}</td>
+      <td class="p-3">
+        <a href="site.html?site=${site.file}" class="text-blue-600 underline">View</a>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function applyFilters() {
+  const pftValue = document.getElementById("pftFilter").value;
+  const sensorValue = document.getElementById("sensorFilter").value;
+  const statusValue = document.getElementById("statusFilter").value;
+
+  const filtered = allSites.filter(site => {
+    const matchesPFT = !pftValue || site.PFT === pftValue;
+    const matchesSensor = !sensorValue || site.sensor === sensorValue;
+    const matchesStatus = !statusValue || site.status === statusValue;
+    return matchesPFT && matchesSensor && matchesStatus;
+  });
+
+  renderSiteTable(filtered);
+}
+
+
+async function loadSiteTable() {
+  const cacheBuster = `?cb=${Date.now()}`;
+  const res = await fetch(`live_sites/index.json${cacheBuster}`);
+  const files = await res.json();
+  const rows = [];
+
+  for (const file of files) {
+    const siteRes = await fetch(`live_sites/${file}${cacheBuster}`);
+    const site = await siteRes.json();
+
+    rows.push({
+      siteID: site.siteID,
+      lat: site.lat,
+      long: site.long,
+      elev: site.elev,
+      PFT: PFT_LOOKUP[site.PFT] || "Unknown",
+      sensor: site.instrument_type || "—",
+      status: site.siteStatus,
+      file
+    });
+  }
+
+  allSites = rows.sort((a, b) => a.siteID.localeCompare(b.siteID));
+  renderSiteTable(allSites);
+}
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  populatePFTOptions();
+  populateSensorOptions();
+  populateStatusOptions(); 
+  loadSiteTable();
+  document.getElementById("pftFilter").addEventListener("change", applyFilters);
+  document.getElementById("sensorFilter").addEventListener("change", applyFilters);
+  document.getElementById("statusFilter").addEventListener("change", applyFilters);
+});
+
+
+
+</script>
+  
+  <!-- WELCOME SECTION-->
+  <main class="flex justify-center items-center my-12 px-4">
+    <div class="text-center bg-gradient-to-br from-red-600 to-orange-500 text-white p-10 rounded-3xl shadow-lg max-w-4xl w-full">
+      <h2 class="text-5xl font-extrabold mb-4 whitespace">Site List</h2>
+      <p class="text-xl opacity-90">A comprehensive list of all TIR monitoring sites in our network.</p>
+    </div>
+  </main>
+  
+<section class="max-w-6xl mx-auto my-12 px-4">
+  <!-- Filter Controls -->
+  <div class="flex flex-wrap gap-4 mb-4">
+    
+    <!-- PFT Filter -->
+    <div class="flex flex-col">
+      <label for="pftFilter" class="mb-1 font-medium text-gray-700">Filter by PFT:</label>
+      <select id="pftFilter" class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+        <option value="">All PFTs</option>
+      </select>
+    </div>
+
+    <!-- Sensor Type Filter -->
+    <div class="flex flex-col">
+      <label for="sensorFilter" class="mb-1 font-medium text-gray-700">Sensor Type:</label>
+      <select id="sensorFilter" class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+        <option value="">All Sensors</option>
+      </select>
+    </div>
+
+    <!-- Status Filter -->
+    <div class="flex flex-col">
+      <label for="statusFilter" class="mb-1 font-medium text-gray-700">Site Status:</label>
+      <select id="statusFilter" class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+        <option value="">All Sites</option>
+      </select>
+    </div>
+
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="min-w-full bg-white border border-gray-300 text-sm rounded-xl overflow-hidden shadow-md" id="siteTable">
+      <thead class="bg-gray-100 text-left">
+        <tr>
+          <th class="p-3 border-b">Site ID</th>
+          <th class="p-3 border-b">Latitude</th>
+          <th class="p-3 border-b">Longitude</th>
+          <th class="p-3 border-b">Elevation (m)</th>
+          <th class="p-3 border-b">PFT</th>
+          <th class="p-3 border-b">Sensor Type</th>
+          <th class="p-3 border-b">Site Status</th>
+          <th class="p-3 border-b">Site Details</th>
+        </tr>
+      </thead>
+      <tbody id="siteTableBody"></tbody>
+    </table>
+  </div>
+</section>
+
+
+    <!-- FOOTER -->
+  <footer class="bg-gray-200 text-sm text-center p-4 mt-12">
+    © 2025 TIR-ific Network. All rights reserved.<br />
+    Connecting the world through thermal insights.
+  </footer>
+
+</body>
+</html>
