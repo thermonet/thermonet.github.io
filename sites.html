@@ -143,13 +143,19 @@
   }
 
 function findSiteImage(name, imgElement, fallbackElement) {
-  const baseName = name.trim().replace(/\s+/g, "_");
+  const cleanName = name.trim();
+  const underscoreName = cleanName.replace(/\s+/g, "_");
 
   const possibleImages = [
-    `sites/${baseName}.jpg`,
-    `sites/${baseName}.jpeg`,
-    `sites/${baseName}.png`,
-    `sites/${baseName}.webp`
+    `sites/${underscoreName}.png`,
+    `sites/${underscoreName}.jpg`,
+    `sites/${underscoreName}.jpeg`,
+    `sites/${underscoreName}.webp`,
+
+    `sites/${cleanName}.png`,
+    `sites/${cleanName}.jpg`,
+    `sites/${cleanName}.jpeg`,
+    `sites/${cleanName}.webp`
   ];
 
   let index = 0;
@@ -161,7 +167,7 @@ function findSiteImage(name, imgElement, fallbackElement) {
       return;
     }
 
-    // 👇 THIS IS THE KEY FIX
+    console.log("Trying image:", possibleImages[index]);
     imgElement.src = possibleImages[index] + `?cb=${Date.now()}`;
     index++;
   }
