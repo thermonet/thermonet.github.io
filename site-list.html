@@ -11,18 +11,56 @@
 
 <body class="bg-gray-50 text-gray-900 font-sans">
 
-<!-- NAVIGATION BAR -->
+<!-- GRADIENT NAVIGATION BAR -->
 <nav class="bg-gradient-to-br from-red-600 to-orange-500 text-white sticky top-0 z-50 shadow-lg">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between h-16 items-center">
       <div class="text-white font-extrabold text-xl">ThermO Net</div>
 
       <div class="flex items-center space-x-6"> 
-        <a href="./" class="hover:underline">Home</a>
+        <a href="/" class="hover:underline">Home</a>
         <a href="map.html" class="hover:underline">Map</a>
-        <a href="sites.html" class="hover:underline">Gallery</a>
-        <a href="site-list.html" class="hover:underline">Site List</a>
-        <a href="add-site.html" class="hover:underline">Contribute</a>
+
+    <!-- Sites Dropdown -->
+    <div class="relative dropdown-container">
+      <button onclick="toggleDropdown('sitesMenu')" class="hover:underline flex items-center gap-1 focus:outline-none">
+        Sites
+        <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20">
+          <path d="M5.5 7l4.5 4.5L14.5 7z" />
+        </svg>
+      </button>
+      <div id="sitesMenu" class="dropdown-menu absolute left-0 mt-2 bg-white text-gray-900 rounded-md shadow-lg w-40 hidden z-50">
+        <a href="sites.html" class="block px-4 py-2 hover:bg-gray-100">Gallery</a>
+        <a href="site-list.html" class="block px-4 py-2 hover:bg-gray-100">Site List</a>
+      </div>
+    </div>
+    
+    <!-- Add Site Dropdown -->
+    <div class="relative dropdown-container">
+      <button onclick="toggleDropdown('addSiteMenu')" class="hover:underline flex items-center gap-1 focus:outline-none">
+        Contribute
+        <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20">
+          <path d="M5.5 7l4.5 4.5L14.5 7z" />
+        </svg>
+      </button>
+      <div id="addSiteMenu" class="dropdown-menu absolute left-0 mt-2 bg-white text-gray-900 rounded-md shadow-lg w-48 hidden z-50">
+        <a href="add-site.html" class="block px-4 py-2 hover:bg-gray-100">New Site Form</a>
+      </div>
+    </div>
+    <!-- How To Dropdown -->
+    <div class="relative dropdown-container">
+      <button onclick="toggleDropdown('howToMenu')" class="hover:underline flex items-center gap-1 focus:outline-none">
+        How To
+        <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20">
+          <path d="M5.5 7l4.5 4.5L14.5 7z" />
+        </svg>
+      </button>
+      <div id="howToMenu" class="dropdown-menu absolute left-0 mt-2 bg-white text-gray-900 rounded-md shadow-lg w-48 hidden z-50">
+        <a href="best-practices.html" class="block px-4 py-2 hover:bg-gray-100">Installation Guide</a>
+        <a href="tier-tables.html" class="block px-4 py-2 hover:bg-gray-100">Tiers</a>
+        <a href="post-process.html" class="block px-4 py-2 hover:bg-gray-100">Post-Processing</a>
+      </div>
+    </div>
         <a href="about.html" class="hover:underline">About</a> 
         <a href="contact.html" class="hover:underline">Contact</a>
       </div>
