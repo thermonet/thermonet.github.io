@@ -174,21 +174,39 @@ async function loadSites() {
       const name = row.Name || "Unnamed site";
       const lat = parseFloat(row.Lat);
       const long = parseFloat(row.Long);
-      const status = row.Active || "Unknown";
-
-      if (!Number.isFinite(lat) || !Number.isFinite(long)) {
-        console.warn("Skipping row with invalid coordinates:", row);
-        return;
+      const statusRaw = (row.Active || "").trim().toUpperCase();
+      
+      if (!Number.isFinite(lat) || !Number.isFinite(long)) return;
+      
+      // Determine status + color
+      let color, label;
+      
+      if (statusRaw === "Y") {
+        color = "#22c55e";   // green
+        label = "Active";
+      } else if (statusRaw === "N") {
+        color = "#ef4444";   // red
+        label = "Inactive";
+      } else {
+        color = "#3b82f6";   // blue
+        label = "Unknown";
       }
-
-      const marker = L.marker([lat, long]).addTo(map);
-
+      
+      const marker = L.circleMarker([lat, long], {
+        radius: 8,
+        fillColor: color,
+        color: "#ffffff",
+        weight: 1.5,
+        fillOpacity: 0.9
+      }).addTo(map);
+      
       marker.bindPopup(`
         <div class="text-sm space-y-1.5">
           <div class="text-red-600 font-semibold text-base">${name}</div>
-          <div class="text-gray-600"><strong>Status:</strong> ${status}</div>
+          <div class="text-gray-600"><strong>Status:</strong> ${label}</div>
         </div>
       `);
+
 
       bounds.push([lat, long]);
     });
