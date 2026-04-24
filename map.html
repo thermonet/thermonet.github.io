@@ -171,10 +171,9 @@ async function loadSites() {
     const bounds = [];
 
     parsed.data.forEach(site => {
-      const name = site.name || "Unnamed site";
+      const name = site.Name || "Unnamed site";
       const lat = parseFloat(site.Lat);
       const long = parseFloat(site.Long);
-      const pft = site.pft || "Unknown PFT";
       const status = site.Active || "Unknown status";
 
       if (!Number.isFinite(lat) || !Number.isFinite(long)) return;
