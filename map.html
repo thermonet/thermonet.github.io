@@ -154,49 +154,53 @@
   L.control.layers(baseMaps).addTo(map);
 
 async function loadSites() {
-  const PFT_NAMES = {
-    0: "Bare Ground",
-    1: "Needleleaf evergreen tree – temperate",
-    2: "Needleleaf evergreen tree – boreal",
-    3: "Needleleaf deciduous tree – boreal",
-    4: "Broadleaf evergreen tree – tropical",
-    5: "Broadleaf evergreen tree – temperate",
-    6: "Broadleaf deciduous tree – tropical",
-    7: "Broadleaf deciduous tree – temperate",
-    8: "Broadleaf deciduous tree – boreal",
-    9: "Broadleaf evergreen shrub – temperate",
-    10: "Broadleaf deciduous shrub – temperate",
-    11: "Broadleaf deciduous shrub – boreal",
-    12: "C3 arctic grass",
-    13: "C3 grass",
-    14: "C4 grass",
-    15: "C3 Unmanaged Rainfed Crop",
-    16: "C3 Unmanaged Irrigated Crop",
-    17: "Managed Rainfed Crop",
-    18: "Managed Irrigated Crop"
-  };
+  try {
+    const res = await fetch(`data/sites.csv?cb=${Date.now()}`);
 
-  const indexResponse = await fetch(`live_sites/index.json?cache_bust=${Date.now()}`);
-  const siteFiles = await indexResponse.json();
-  
-  for (const file of siteFiles) {
-    const response = await fetch(`live_sites/${file}?cache_bust=${Date.now()}`);
-    const site = await response.json();
+    if (!res.ok) {
+      throw new Error("Could not load data/sites.csv");
+    }
 
-    const pftLabel = PFT_NAMES[parseInt(site.PFT)] || "Unknown PFT";
+    const csvText = await res.text();
 
-    const marker = L.marker([site.lat, site.long]).addTo(map);
-    marker.bindPopup(`
-      <div class="text-sm space-y-1.5">
-        <div class="text-red-600 font-semibold text-base">${site.siteName}</div>
-        <div class="text-gray-500 italic text-s">${pftLabel}</div>
-        <div class="text-gray-600 text-s"><strong>Sensor:</strong> ${site.instrument_type || "Unknown"}</div>
-        <a href="site.html?site=${file}" class="text-blue-600 underline text-xs inline-block">View Full Site Info</a>
-      </div>
-    `);
+    const parsed = Papa.parse(csvText, {
+      header: true,
+      skipEmptyLines: true
+    });
+
+    const bounds = [];
+
+    parsed.data.forEach(site => {
+      const name = site.name || "Unnamed site";
+      const lat = parseFloat(site.Lat);
+      const long = parseFloat(site.Long);
+      const pft = site.pft || "Unknown PFT";
+      const status = site.Active || "Unknown status";
+
+      if (!Number.isFinite(lat) || !Number.isFinite(long)) return;
+
+      const marker = L.marker([lat, long]).addTo(map);
+
+      marker.bindPopup(`
+        <div class="text-sm space-y-1.5">
+          <div class="text-red-600 font-semibold text-base">${name}</div>
+          <div class="text-gray-500 italic">${pft}</div>
+          <div class="text-gray-600"><strong>Status:</strong> ${status}</div>
+        </div>
+      `);
+
+      bounds.push([lat, long]);
+    });
+
+    if (bounds.length > 0) {
+      map.fitBounds(bounds, { padding: [40, 40] });
+    }
+
+  } catch (error) {
+    console.error(error);
+    alert("Could not load site points. Check that data/sites.csv exists and has columns: name, lat, long, pft, site_status.");
   }
 }
-
 
 loadSites();
 
