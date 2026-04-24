@@ -4,7 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ThermO Net | Gallery</title>
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- PapaParse for CSV -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 </head>
 <body class="bg-gray-50 text-gray-900 font-sans">
   
@@ -85,93 +89,190 @@
   });
 </script>
 
-  <!-- WELCOME SECTION-->
-  <main class="flex justify-center items-center my-12 px-4">
-    <div class="text-center bg-gradient-to-br from-red-600 to-orange-500 text-white p-10 rounded-3xl shadow-lg max-w-4xl w-full space-y-4">
-      <h2 class="text-5xl font-extrabold whitespace">All Sites</h2>
-      <p class="text-xl opacity-90">Click on an image to go to that site's page.</p>
+<!-- HERO SECTION -->
+<main class="flex justify-center items-center my-12 px-4">
+  <div class="text-center bg-gradient-to-br from-red-600 to-orange-500 text-white p-10 rounded-3xl shadow-lg max-w-4xl w-full">
+    <h2 class="text-5xl font-extrabold mb-4">Site Gallery</h2>
+    <p class="text-xl opacity-90">
+      Explore thermal monitoring sites in the ThermO Net network.
+    </p>
+  </div>
+</main>
+
+<!-- GALLERY -->
+<section class="max-w-7xl mx-auto my-12 px-4">
+  <div id="siteGallery" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="col-span-full text-center text-gray-500">
+      Loading sites...
     </div>
-  </main>
-  
-  <!-- SITE CARDS -->
-  <section class="max-w-7xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 mb-16" id="site-cards">
-    <!-- Site cards will be dynamically inserted here -->
-  </section>
-  
-    <!-- FOOTER -->
-  <footer class="bg-gray-200 text-sm text-center p-4 mt-12">
-    © 2026 ThermO Net. All rights reserved.<br />
-    Connecting the world through thermal insights.
-  </footer>
+  </div>
+</section>
 
-<!-- LOAD SITE JSONS AND CREATE GALLERY -->
+<!-- FOOTER -->
+<footer class="bg-gray-200 text-sm text-center p-4 mt-12">
+  © 2026 ThermO Net. All rights reserved.<br />
+  Connecting the world through thermal insights.
+</footer>
+
 <script>
-  const indexPath = 'live_sites/index.json';
+  function normalize(value) {
+    return value ? value.trim() : "—";
+  }
 
-  async function loadSites() {
-    const cacheBuster = `?cache_bust=${Date.now()}`;
-    const indexRes = await fetch(indexPath + cacheBuster);
-    const files = await indexRes.json();
-    const pftMap = {
-      0: "Bare Ground",
-      1: "Needleleaf evergreen tree – temperate",
-      2: "Needleleaf evergreen tree – boreal",
-      3: "Needleleaf deciduous tree – boreal",
-      4: "Broadleaf evergreen tree – tropical",
-      5: "Broadleaf evergreen tree – temperate",
-      6: "Broadleaf deciduous tree – tropical",
-      7: "Broadleaf deciduous tree – temperate",
-      8: "Broadleaf deciduous tree – boreal",
-      9: "Broadleaf evergreen shrub – temperate",
-      10: "Broadleaf deciduous shrub – temperate",
-      11: "Broadleaf deciduous shrub – boreal",
-      12: "C3 arctic grass",
-      13: "C3 grass",
-      14: "C4 grass",
-      15: "C3 Unmanaged Rainfed Crop",
-      16: "C3 Unmanaged Irrigated Crop",
-      17: "Managed Rainfed Crop",
-      18: "Managed Irrigated Crop"
-    };
+  function formatStatus(value) {
+    const status = (value || "").trim().toUpperCase();
 
-    const container = document.getElementById('site-cards');
-    const siteDataList = [];
+    if (status === "Y") return "Active";
+    if (status === "N") return "Inactive";
+    return "Unknown";
+  }
 
-    // Step 1: Load all site data
-    for (const file of files) {
-      const res = await fetch(`live_sites/${file}${cacheBuster}`);
-      const data = await res.json();
-      siteDataList.push({ file, data });
+  function getStatusBadge(value) {
+    const status = (value || "").trim().toUpperCase();
+
+    if (status === "Y") {
+      return `<span class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-700">Active</span>`;
     }
 
-    // Step 2: Sort by siteName
-    siteDataList.sort((a, b) => a.data.siteName.localeCompare(b.data.siteName));
+    if (status === "N") {
+      return `<span class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-700">Inactive</span>`;
+    }
 
-    // Step 3: Render cards
-    for (const { file, data } of siteDataList) {
-      const card = document.createElement('a');
-      card.href = `site.html?site=${file}`;
-      card.className = "block bg-white border border-gray-200 rounded-2xl shadow hover:shadow-lg transition p-6";
+    return `<span class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-700">Unknown</span>`;
+  }
 
-      const status = data.siteStatus?.charAt(0).toUpperCase() + data.siteStatus?.slice(1).toLowerCase();
-      const pftName = pftMap[data.PFT] || "Unknown";
+  function makeSafeFilename(name) {
+    return name.trim().replace(/\s+/g, "_");
+  }
 
-      card.innerHTML = `
-        <img src="site-images/processed/${data.siteID}_tir_preview.png" alt="${data.siteName} TIR preview"
-             class="rounded-xl mb-3 w-full h-56 object-cover" />
-        <h3 class="text-xl font-semibold mb-1 text-red-600 truncate">${data.siteName}</h3>
-        <p class="text-xs text-gray-600"><strong>Status:</strong> ${status}</p>
-        <p class="text-xs text-gray-600"><strong>PFT:</strong> ${pftName}</p>
+  function findSiteImage(name, imgElement, fallbackElement) {
+    const baseName = makeSafeFilename(name);
+
+    const possibleImages = [
+      `sites/${baseName}.jpg`,
+      `sites/${baseName}.jpeg`,
+      `sites/${baseName}.png`,
+      `sites/${baseName}.webp`,
+      `sites/${name}.jpg`,
+      `sites/${name}.jpeg`,
+      `sites/${name}.png`,
+      `sites/${name}.webp`
+    ];
+
+    let index = 0;
+
+    function tryNextImage() {
+      if (index >= possibleImages.length) {
+        imgElement.classList.add("hidden");
+        fallbackElement.classList.remove("hidden");
+        return;
+      }
+
+      imgElement.src = possibleImages[index];
+      index++;
+    }
+
+    imgElement.onerror = tryNextImage;
+
+    imgElement.onload = function () {
+      imgElement.classList.remove("hidden");
+      fallbackElement.classList.add("hidden");
+    };
+
+    tryNextImage();
+  }
+
+  function renderSiteGallery(data) {
+    const gallery = document.getElementById("siteGallery");
+
+    if (!data.length) {
+      gallery.innerHTML = `
+        <div class="col-span-full text-center text-red-600">
+          No sites found. Check that data/sites.csv exists and has the correct column names.
+        </div>
       `;
+      return;
+    }
 
-      container.appendChild(card);
+    gallery.innerHTML = data.map((site, i) => `
+      <div class="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition">
+        
+        <div class="h-56 bg-gray-100 flex items-center justify-center">
+          <img 
+            id="site-img-${i}" 
+            class="hidden w-full h-full object-cover" 
+            alt="${site.name}"
+          >
+
+          <div 
+            id="site-fallback-${i}" 
+            class="hidden w-full h-full flex items-center justify-center text-gray-500 text-center px-6 bg-gray-100"
+          >
+            No image currently available
+          </div>
+        </div>
+
+        <div class="p-5 space-y-2">
+          <div class="flex justify-between items-start gap-3">
+            <h3 class="text-xl font-bold text-red-600">${site.name}</h3>
+            ${getStatusBadge(site.active)}
+          </div>
+
+          <div class="text-sm text-gray-600 space-y-1">
+            <p><strong>Latitude:</strong> ${site.lat}</p>
+            <p><strong>Longitude:</strong> ${site.long}</p>
+          </div>
+        </div>
+      </div>
+    `).join("");
+
+    data.forEach((site, i) => {
+      const img = document.getElementById(`site-img-${i}`);
+      const fallback = document.getElementById(`site-fallback-${i}`);
+      findSiteImage(site.name, img, fallback);
+    });
+  }
+
+  async function loadSiteGallery() {
+    try {
+      const res = await fetch(`data/sites.csv?cb=${Date.now()}`);
+
+      if (!res.ok) {
+        throw new Error("Could not load data/sites.csv");
+      }
+
+      const csvText = await res.text();
+
+      const parsed = Papa.parse(csvText, {
+        header: true,
+        skipEmptyLines: true
+      });
+
+      const sites = parsed.data
+        .map(row => ({
+          name: normalize(row.Name),
+          lat: normalize(row.Lat),
+          long: normalize(row.Long),
+          active: normalize(row.Active)
+        }))
+        .filter(site => site.name !== "—")
+        .sort((a, b) => a.name.localeCompare(b.name));
+
+      renderSiteGallery(sites);
+
+    } catch (error) {
+      console.error(error);
+
+      document.getElementById("siteGallery").innerHTML = `
+        <div class="col-span-full text-center text-red-600">
+          Could not load site gallery. Check that <code>data/sites.csv</code> exists and has columns: Name, Lat, Long, Active.
+        </div>
+      `;
     }
   }
 
-  loadSites();
+  document.addEventListener("DOMContentLoaded", loadSiteGallery);
 </script>
-
-
 
 </body>
 </html>
