@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ThermO Net | Map</title>
-
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
@@ -170,20 +170,22 @@ async function loadSites() {
 
     const bounds = [];
 
-    parsed.data.forEach(site => {
-      const name = site["Name"] || "Unnamed site";
-      const lat = parseFloat(site["Lat"]);
-      const long = parseFloat(site["Long"]);
-      const status = site["Active"] || "Unknown";
+    parsed.data.forEach(row => {
+      const name = row.Name || "Unnamed site";
+      const lat = parseFloat(row.Lat);
+      const long = parseFloat(row.Long);
+      const status = row.Active || "Unknown";
 
-      if (!Number.isFinite(lat) || !Number.isFinite(long)) return;
+      if (!Number.isFinite(lat) || !Number.isFinite(long)) {
+        console.warn("Skipping row with invalid coordinates:", row);
+        return;
+      }
 
       const marker = L.marker([lat, long]).addTo(map);
 
       marker.bindPopup(`
         <div class="text-sm space-y-1.5">
           <div class="text-red-600 font-semibold text-base">${name}</div>
-          <div class="text-gray-500 italic">${pft}</div>
           <div class="text-gray-600"><strong>Status:</strong> ${status}</div>
         </div>
       `);
@@ -197,12 +199,11 @@ async function loadSites() {
 
   } catch (error) {
     console.error(error);
-    alert("Could not load site points. Check that data/sites.csv exists and has columns: name, lat, long, pft, site_status.");
+    alert("Could not load site points. Check that data/sites.csv exists and has columns: Name, Lat, Long, Active.");
   }
 }
 
 loadSites();
-
 </script>
 
 
