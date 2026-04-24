@@ -145,42 +145,39 @@
     return name.trim().replace(/\s+/g, "_");
   }
 
-  function findSiteImage(name, imgElement, fallbackElement) {
-    const baseName = makeSafeFilename(name);
+function findSiteImage(name, imgElement, fallbackElement) {
+  const baseName = name.trim().replace(/\s+/g, "_");
 
-    const possibleImages = [
-      `sites/${baseName}.jpg`,
-      `sites/${baseName}.jpeg`,
-      `sites/${baseName}.png`,
-      `sites/${baseName}.webp`,
-      `sites/${name}.jpg`,
-      `sites/${name}.jpeg`,
-      `sites/${name}.png`,
-      `sites/${name}.webp`
-    ];
+  const possibleImages = [
+    `sites/${baseName}.jpg`,
+    `sites/${baseName}.jpeg`,
+    `sites/${baseName}.png`,
+    `sites/${baseName}.webp`
+  ];
 
-    let index = 0;
+  let index = 0;
 
-    function tryNextImage() {
-      if (index >= possibleImages.length) {
-        imgElement.classList.add("hidden");
-        fallbackElement.classList.remove("hidden");
-        return;
-      }
-
-      imgElement.src = possibleImages[index];
-      index++;
+  function tryNextImage() {
+    if (index >= possibleImages.length) {
+      imgElement.classList.add("hidden");
+      fallbackElement.classList.remove("hidden");
+      return;
     }
 
-    imgElement.onerror = tryNextImage;
-
-    imgElement.onload = function () {
-      imgElement.classList.remove("hidden");
-      fallbackElement.classList.add("hidden");
-    };
-
-    tryNextImage();
+    // 👇 THIS IS THE KEY FIX
+    imgElement.src = possibleImages[index] + `?cb=${Date.now()}`;
+    index++;
   }
+
+  imgElement.onerror = tryNextImage;
+
+  imgElement.onload = function () {
+    imgElement.classList.remove("hidden");
+    fallbackElement.classList.add("hidden");
+  };
+
+  tryNextImage();
+}
 
   function renderSiteGallery(data) {
     const gallery = document.getElementById("siteGallery");
