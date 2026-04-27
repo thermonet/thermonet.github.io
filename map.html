@@ -127,11 +127,11 @@
   const street = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>'
   });
-  
+
   const topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://opentopomap.org">OpenTopoMap</a>'
   });
-  
+
   const satellite = L.tileLayer(
     'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
     {
@@ -152,93 +152,130 @@
   };
 
   L.control.layers(baseMaps).addTo(map);
+
   const legend = L.control({ position: "bottomright" });
 
   legend.onAdd = function () {
     const div = L.DomUtil.create("div");
     div.className = "bg-white p-3 rounded-lg shadow text-sm";
-  
+
     div.innerHTML = `
       <div class="font-semibold mb-1">Site Status</div>
       <div><span style="color:#22c55e;">●</span> Active</div>
       <div><span style="color:#ef4444;">●</span> Inactive</div>
       <div><span style="color:#3b82f6;">●</span> Unknown</div>
     `;
-  
+
     return div;
   };
 
-legend.addTo(map);
+  legend.addTo(map);
 
-async function loadSites() {
-  try {
-    const res = await fetch(`data/sites.csv?cb=${Date.now()}`);
-
-    if (!res.ok) {
-      throw new Error("Could not load data/sites.csv");
-    }
-
-    const csvText = await res.text();
-
-    const parsed = Papa.parse(csvText, {
-      header: true,
-      skipEmptyLines: true
-    });
-
-    const bounds = [];
-
-    parsed.data.forEach(row => {
-      const name = row.Name || "Unnamed site";
-      const lat = parseFloat(row.Lat);
-      const long = parseFloat(row.Long);
-      const statusRaw = (row.Active || "").trim().toUpperCase();
-      
-      if (!Number.isFinite(lat) || !Number.isFinite(long)) return;
-      
-      // Determine status + color
-      let color, label;
-      
-      if (statusRaw === "Y") {
-        color = "#22c55e";   // green
-        label = "Active";
-      } else if (statusRaw === "N") {
-        color = "#ef4444";   // red
-        label = "Inactive";
-      } else {
-        color = "#3b82f6";   // blue
-        label = "Unknown";
-      }
-      
-      const marker = L.circleMarker([lat, long], {
-        radius: 8,
-        fillColor: color,
-        color: "#ffffff",
-        weight: 1.5,
-        fillOpacity: 0.9
-      }).addTo(map);
-      
-      marker.bindPopup(`
-        <div class="text-sm space-y-1.5">
-          <div class="text-red-600 font-semibold text-base">${name}</div>
-          <div class="text-gray-600"><strong>Status:</strong> ${label}</div>
-        </div>
-      `);
-
-
-      bounds.push([lat, long]);
-    });
-
-    if (bounds.length > 0) {
-      map.fitBounds(bounds, { padding: [40, 40] });
-    }
-
-  } catch (error) {
-    console.error(error);
-    alert("Could not load site points. Check that data/sites.csv exists and has columns: Name, Lat, Long, Active.");
+  function getColumn(row, keyword) {
+    const key = Object.keys(row).find(k =>
+      k.replace(/\s+/g, " ").toLowerCase().includes(keyword.toLowerCase())
+    );
+    return key ? row[key] : "";
   }
-}
 
-loadSites();
+  function cleanText(value) {
+    if (!value) return "";
+
+    return value
+      .replace(/â€“/g, "-")
+      .replace(/â€”/g, "-")
+      .replace(/Ã—/g, "×")
+      .replace(/Â°/g, "°")
+      .replace(/Ð/g, "-")
+      .replace(/[–—−]/g, "-")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function getStatusLabel(value) {
+    const status = cleanText(value).toLowerCase();
+
+    if (status.includes("active") && !status.includes("inactive")) {
+      return { label: "Active", color: "#22c55e" };
+    }
+
+    if (status.includes("inactive")) {
+      return { label: "Inactive", color: "#ef4444" };
+    }
+
+    if (status === "y" || status === "yes") {
+      return { label: "Active", color: "#22c55e" };
+    }
+
+    if (status === "n" || status === "no") {
+      return { label: "Inactive", color: "#ef4444" };
+    }
+
+    return { label: "Unknown", color: "#3b82f6" };
+  }
+
+  async function loadSites() {
+    try {
+      const res = await fetch(`data/sites.csv?cb=${Date.now()}`);
+
+      if (!res.ok) {
+        throw new Error("Could not load data/sites.csv");
+      }
+
+      const csvText = await res.text();
+
+      const parsed = Papa.parse(csvText, {
+        header: true,
+        skipEmptyLines: true
+      });
+
+      const bounds = [];
+
+      parsed.data.forEach(row => {
+        const siteID = cleanText(getColumn(row, "site id")) || "Unknown site";
+        const siteNameLong = cleanText(getColumn(row, "site name long"));
+        const pft = cleanText(getColumn(row, "plant functional type"));
+
+        const lat = parseFloat(cleanText(getColumn(row, "site latitude")));
+        const long = parseFloat(cleanText(getColumn(row, "site longitude")));
+
+        const statusInfo = getStatusLabel(getColumn(row, "site status"));
+
+        if (!Number.isFinite(lat) || !Number.isFinite(long)) return;
+
+        const marker = L.circleMarker([lat, long], {
+          radius: 8,
+          fillColor: statusInfo.color,
+          color: "#ffffff",
+          weight: 1.5,
+          fillOpacity: 0.9
+        }).addTo(map);
+
+        marker.bindPopup(`
+          <div class="text-sm space-y-1.5">
+            <div class="text-red-600 font-semibold text-base">${siteID}</div>
+            ${siteNameLong ? `<div class="text-gray-700">${siteNameLong}</div>` : ""}
+            <div class="text-gray-600"><strong>Status:</strong> ${statusInfo.label}</div>
+            ${pft ? `<div class="text-gray-600"><strong>PFT:</strong> ${pft}</div>` : ""}
+            <div class="text-gray-600"><strong>Latitude:</strong> ${lat}</div>
+            <div class="text-gray-600"><strong>Longitude:</strong> ${long}</div>
+          </div>
+        `);
+
+        bounds.push([lat, long]);
+      });
+
+      if (bounds.length > 0) {
+        map.fitBounds(bounds, { padding: [40, 40] });
+      }
+
+    } catch (error) {
+      console.error(error);
+      alert("Could not load site points. Check that data/sites.csv exists and has Site ID, latitude, longitude, and status columns.");
+    }
+  }
+
+  loadSites();
 </script>
 
 
