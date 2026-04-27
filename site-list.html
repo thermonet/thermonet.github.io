@@ -199,7 +199,7 @@ function cleanPFT(value) {
         <td class="p-3 font-medium">${site.name}</td>
         <td class="p-3">${site.lat}</td>
         <td class="p-3">${site.long}</td>
-        <td class="p-3">${site.pft}</td>
+        <td class="p-3">${site.pft.join(", ") || "—"}</td>
         <td class="p-3">${capitalize(site.site_status)}</td>
       </tr>
     `).join('');
@@ -209,7 +209,12 @@ function cleanPFT(value) {
     const pftFilter = document.getElementById("pftFilter");
     const statusFilter = document.getElementById("statusFilter");
 
-    const pfts = [...new Set(data.map(site => site.pft).filter(v => v && v !== "—"))].sort();
+    const pfts = [
+      ...new Set(
+        data.flatMap(site => site.pft)
+          .filter(v => v && v !== "—")
+      )
+    ].sort();
     const statuses = [...new Set(data.map(site => site.site_status).filter(v => v && v !== "—"))].sort();
 
     pfts.forEach(pft => {
@@ -256,14 +261,22 @@ function cleanPFT(value) {
       });
 
       allSites = parsed.data
-        .map(row => ({
-          name: normalize(getColumn(row, "site id")),
-          lat: normalize(getColumn(row, "latitude")),
-          long: normalize(getColumn(row, "longitude")),
-          pft: cleanPFT(getColumn(row, "plant functional type")),
-          site_status: normalize(getColumn(row, "site status"))
-        }))
-              .sort((a, b) => a.name.localeCompare(b.name));
+        .map(row => {
+          const rawPFT = cleanPFT(getColumn(row, "plant functional type"));
+      
+          const pftArray = rawPFT
+            ? rawPFT.split(",").map(p => p.trim()).filter(Boolean)
+            : [];
+      
+          return {
+            name: cleanText(getColumn(row, "site name")),
+            lat: cleanText(getColumn(row, "latitude")),
+            long: cleanText(getColumn(row, "longitude")),
+            pft: pftArray,  // now an array
+            site_status: cleanText(getColumn(row, "site status"))
+          };
+        })
+        .sort((a, b) => a.name.localeCompare(b.name));
 
       populateFilters(allSites);
       renderSiteTable(allSites);
