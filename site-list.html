@@ -188,7 +188,15 @@
       </tr>
     `).join('');
   }
-
+  function cleanPFT(value) {
+    if (!value) return "—";
+  
+    return value
+      .replace(/[–—]/g, "-")     // normalize dashes
+      .replace(/\s+/g, " ")      // collapse whitespace
+      .trim()
+      .toUpperCase();            // optional: standardize casing
+  }
   function populateFilters(data) {
     const pftFilter = document.getElementById("pftFilter");
     const statusFilter = document.getElementById("statusFilter");
@@ -244,7 +252,7 @@
           name: normalize(getColumn(row, "site id")),
           lat: normalize(getColumn(row, "latitude")),
           long: normalize(getColumn(row, "longitude")),
-          pft: normalize(getColumn(row, "plant functional type")),
+          pft: cleanPFT(getColumn(row, "plant functional type")),
           site_status: normalize(getColumn(row, "site status"))
         }))
               .sort((a, b) => a.name.localeCompare(b.name));
