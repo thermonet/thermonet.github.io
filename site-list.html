@@ -192,9 +192,9 @@
     if (!value) return "—";
   
     return value
-      .replace(/[–—]/g, "-")     // normalize dashes
-      .replace(/\s+/g, " ")      // collapse whitespace
-      .trim()
+      .replace(/[–—−]/g, "-")   // normalize legit dash types
+      .replace(/\s+/g, " ")
+      .trim();
   }
   function populateFilters(data) {
     const pftFilter = document.getElementById("pftFilter");
@@ -238,8 +238,7 @@
       if (!res.ok) {
         throw new Error("Could not load data/sites.csv");
       }
-      const buffer = await res.arrayBuffer();
-      const csvText = new TextDecoder("windows-1252").decode(buffer);
+    const csvText = await res.text();
 
 
       const parsed = Papa.parse(csvText, {
