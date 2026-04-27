@@ -112,75 +112,95 @@
 </footer>
 
 <script>
-  function normalize(value) {
-    return value ? value.trim() : "—";
+  function getColumn(row, keyword) {
+    const key = Object.keys(row).find(k =>
+      k.replace(/\s+/g, " ").toLowerCase().includes(keyword.toLowerCase())
+    );
+    return key ? row[key] : "";
   }
 
-  function formatStatus(value) {
-    const status = (value || "").trim().toUpperCase();
+  function cleanText(value) {
+    if (!value) return "";
 
-    if (status === "Y") return "Active";
-    if (status === "N") return "Inactive";
+    return value
+      .replace(/â€“/g, "-")
+      .replace(/â€”/g, "-")
+      .replace(/Ã—/g, "×")
+      .replace(/Â°/g, "°")
+      .replace(/Ð/g, "-")
+      .replace(/[–—−]/g, "-")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function normalize(value) {
+    const cleaned = cleanText(value);
+    return cleaned ? cleaned : "—";
+  }
+
+  function getStatusLabel(value) {
+    const status = cleanText(value).toLowerCase();
+
+    if (status.includes("active") && !status.includes("inactive")) return "Active";
+    if (status.includes("inactive")) return "Inactive";
+    if (status === "y" || status === "yes") return "Active";
+    if (status === "n" || status === "no") return "Inactive";
+
     return "Unknown";
   }
 
   function getStatusBadge(value) {
-    const status = (value || "").trim().toUpperCase();
+    const label = getStatusLabel(value);
 
-    if (status === "Y") {
+    if (label === "Active") {
       return `<span class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-700">Active</span>`;
     }
 
-    if (status === "N") {
+    if (label === "Inactive") {
       return `<span class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-700">Inactive</span>`;
     }
 
     return `<span class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-700">Unknown</span>`;
   }
 
-  function makeSafeFilename(name) {
-    return name.trim().replace(/\s+/g, "_");
-  }
+  function findSiteImage(siteID, imgElement, fallbackElement) {
+    const cleanID = cleanText(siteID);
+    const safeID = cleanID.replace(/\s+/g, "_");
 
-function findSiteImage(name, imgElement, fallbackElement) {
-  const cleanName = name.trim();
-  const underscoreName = cleanName.replace(/\s+/g, "_");
+    const possibleImages = [
+      `sites/${cleanID}.png`,
+      `sites/${cleanID}.jpg`,
+      `sites/${cleanID}.jpeg`,
+      `sites/${cleanID}.webp`,
 
-  const possibleImages = [
-    `sites/${underscoreName}.png`,
-    `sites/${underscoreName}.jpg`,
-    `sites/${underscoreName}.jpeg`,
-    `sites/${underscoreName}.webp`,
+      `sites/${safeID}.png`,
+      `sites/${safeID}.jpg`,
+      `sites/${safeID}.jpeg`,
+      `sites/${safeID}.webp`
+    ];
 
-    `sites/${cleanName}.png`,
-    `sites/${cleanName}.jpg`,
-    `sites/${cleanName}.jpeg`,
-    `sites/${cleanName}.webp`
-  ];
+    let index = 0;
 
-  let index = 0;
+    function tryNextImage() {
+      if (index >= possibleImages.length) {
+        imgElement.classList.add("hidden");
+        fallbackElement.classList.remove("hidden");
+        return;
+      }
 
-  function tryNextImage() {
-    if (index >= possibleImages.length) {
-      imgElement.classList.add("hidden");
-      fallbackElement.classList.remove("hidden");
-      return;
+      imgElement.src = possibleImages[index] + `?cb=${Date.now()}`;
+      index++;
     }
 
-    console.log("Trying image:", possibleImages[index]);
-    imgElement.src = possibleImages[index] + `?cb=${Date.now()}`;
-    index++;
+    imgElement.onerror = tryNextImage;
+
+    imgElement.onload = function () {
+      imgElement.classList.remove("hidden");
+      fallbackElement.classList.add("hidden");
+    };
+
+    tryNextImage();
   }
-
-  imgElement.onerror = tryNextImage;
-
-  imgElement.onload = function () {
-    imgElement.classList.remove("hidden");
-    fallbackElement.classList.add("hidden");
-  };
-
-  tryNextImage();
-}
 
   function renderSiteGallery(data) {
     const gallery = document.getElementById("siteGallery");
@@ -201,7 +221,7 @@ function findSiteImage(name, imgElement, fallbackElement) {
           <img 
             id="site-img-${i}" 
             class="hidden w-full h-full object-cover" 
-            alt="${site.name}"
+            alt="${site.siteID}"
           >
 
           <div 
@@ -214,9 +234,11 @@ function findSiteImage(name, imgElement, fallbackElement) {
 
         <div class="p-5 space-y-2">
           <div class="flex justify-between items-start gap-3">
-            <h3 class="text-xl font-bold text-red-600">${site.name}</h3>
-            ${getStatusBadge(site.active)}
+            <h3 class="text-xl font-bold text-red-600">${site.siteID}</h3>
+            ${getStatusBadge(site.status)}
           </div>
+
+          ${site.siteNameLong !== "—" ? `<p class="text-sm text-gray-700">${site.siteNameLong}</p>` : ""}
 
           <div class="text-sm text-gray-600 space-y-1">
             <p><strong>Latitude:</strong> ${site.lat}</p>
@@ -229,7 +251,7 @@ function findSiteImage(name, imgElement, fallbackElement) {
     data.forEach((site, i) => {
       const img = document.getElementById(`site-img-${i}`);
       const fallback = document.getElementById(`site-fallback-${i}`);
-      findSiteImage(site.name, img, fallback);
+      findSiteImage(site.siteID, img, fallback);
     });
   }
 
@@ -250,13 +272,14 @@ function findSiteImage(name, imgElement, fallbackElement) {
 
       const sites = parsed.data
         .map(row => ({
-          name: normalize(row.Name),
-          lat: normalize(row.Lat),
-          long: normalize(row.Long),
-          active: normalize(row.Active)
+          siteID: normalize(getColumn(row, "site id")),
+          siteNameLong: normalize(getColumn(row, "site name long")),
+          lat: normalize(getColumn(row, "site latitude")),
+          long: normalize(getColumn(row, "site longitude")),
+          status: normalize(getColumn(row, "site status"))
         }))
-        .filter(site => site.name !== "—")
-        .sort((a, b) => a.name.localeCompare(b.name));
+        .filter(site => site.siteID !== "—")
+        .sort((a, b) => a.siteID.localeCompare(b.siteID));
 
       renderSiteGallery(sites);
 
@@ -265,7 +288,7 @@ function findSiteImage(name, imgElement, fallbackElement) {
 
       document.getElementById("siteGallery").innerHTML = `
         <div class="col-span-full text-center text-red-600">
-          Could not load site gallery. Check that <code>data/sites.csv</code> exists and has columns: Name, Lat, Long, Active.
+          Could not load site gallery. Check that <code>data/sites.csv</code> exists and has Site ID, latitude, longitude, and status columns.
         </div>
       `;
     }
