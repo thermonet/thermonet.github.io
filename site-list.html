@@ -195,7 +195,6 @@
       .replace(/[–—]/g, "-")     // normalize dashes
       .replace(/\s+/g, " ")      // collapse whitespace
       .trim()
-      .toUpperCase();            // optional: standardize casing
   }
   function populateFilters(data) {
     const pftFilter = document.getElementById("pftFilter");
