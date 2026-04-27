@@ -163,7 +163,23 @@
     if (!str || str === "—") return "—";
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
+function cleanText(value) {
+  if (!value) return "—";
 
+  return value
+    .replace(/â€“/g, "-")
+    .replace(/â€”/g, "-")
+    .replace(/Ã—/g, "×")
+    .replace(/Â°/g, "°")
+    .replace(/Ð/g, "-")
+    .replace(/[–—−]/g, "-")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function cleanPFT(value) {
+  return cleanText(value);
+}
   function renderSiteTable(data) {
     const tableBody = document.getElementById("siteTableBody");
 
@@ -188,14 +204,7 @@
       </tr>
     `).join('');
   }
-  function cleanPFT(value) {
-    if (!value) return "—";
-  
-    return value
-      .replace(/[–—−]/g, "-")   // normalize legit dash types
-      .replace(/\s+/g, " ")
-      .trim();
-  }
+
   function populateFilters(data) {
     const pftFilter = document.getElementById("pftFilter");
     const statusFilter = document.getElementById("statusFilter");
