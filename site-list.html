@@ -274,7 +274,7 @@ function applyFilters() {
             : [];
       
           return {
-            name: cleanText(getColumn(row, "site name")),
+            name: cleanText(getColumn(row, "site id")),
             lat: cleanText(getColumn(row, "latitude")),
             long: cleanText(getColumn(row, "longitude")),
             pft: pftArray,  // now an array
