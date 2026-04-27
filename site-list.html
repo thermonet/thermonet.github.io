@@ -232,18 +232,23 @@ function cleanPFT(value) {
     });
   }
 
-  function applyFilters() {
-    const pftValue = document.getElementById("pftFilter").value;
-    const statusValue = document.getElementById("statusFilter").value;
+function applyFilters() {
+  const pftValue = document.getElementById("pftFilter").value;
+  const statusValue = document.getElementById("statusFilter").value;
 
-    const filtered = allSites.filter(site => {
-      const matchesPFT = !pftValue || site.pft === pftValue;
-      const matchesStatus = !statusValue || site.site_status === statusValue;
-      return matchesPFT && matchesStatus;
-    });
+  const filtered = allSites.filter(site => {
+    const matchesPFT =
+      !pftValue || site.pft.includes(pftValue);
 
-    renderSiteTable(filtered);
-  }
+    const matchesStatus =
+      !statusValue || site.site_status === statusValue;
+
+    return matchesPFT && matchesStatus;
+  });
+
+  renderSiteTable(filtered);
+}
+
 
   async function loadSiteTable() {
     try {
