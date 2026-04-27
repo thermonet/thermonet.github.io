@@ -149,7 +149,12 @@
 
 <script>
   let allSites = [];
-
+  function getColumn(row, keyword) {
+    const key = Object.keys(row).find(k =>
+      k.toLowerCase().includes(keyword.toLowerCase())
+    );
+    return key ? row[key] : "";
+  }
   function normalize(value) {
     return value ? value.trim() : "—";
   }
@@ -236,13 +241,13 @@
 
       allSites = parsed.data
         .map(row => ({
-          name: normalize(row.Name),
-          lat: normalize(row.Lat),
-          long: normalize(row.Long),
-          pft: normalize(row.pft),
-          site_status: normalize(row.Active)
+          name: normalize(getColumn(row, "site name")),
+          lat: normalize(getColumn(row, "latitude")),
+          long: normalize(getColumn(row, "longitude")),
+          pft: normalize(getColumn(row, "plant functional type")),
+          site_status: normalize(getColumn(row, "site status"))
         }))
-        .sort((a, b) => a.name.localeCompare(b.name));
+              .sort((a, b) => a.name.localeCompare(b.name));
 
       populateFilters(allSites);
       renderSiteTable(allSites);
